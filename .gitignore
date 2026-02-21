@@ -1,0 +1,20 @@
+# Visual Studio / .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.pdb
+*.dll
+*.exe
+.vs/
+
+# Node / React
+node_modules/
+build/
+dist/
+.env
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CosmetologyBooking.API/CosmetologyBooking.API.csproj" />
+    <Project Path="src/CosmetologyBooking.Application/CosmetologyBooking.Application.csproj" />
+    <Project Path="src/CosmetologyBooking.Domain/CosmetologyBooking.Domain.csproj" />
+    <Project Path="src/CosmetologyBooking.Infrastructure/CosmetologyBooking.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CosmetologyBooking.API.Tests/CosmetologyBooking.API.Tests.csproj" />
+    <Project Path="tests/CosmetologyBooking.Application.Tests/CosmetologyBooking.Application.Tests.csproj" />
+    <Project Path="tests/CosmetologyBooking.Domain.Tests/CosmetologyBooking.Domain.Tests.csproj" />
+    <Project Path="tests/CosmetologyBooking.Infrastructure.Tests/CosmetologyBooking.Infrastructure.Tests.csproj" />
+  </Folder>
+</Solution>
