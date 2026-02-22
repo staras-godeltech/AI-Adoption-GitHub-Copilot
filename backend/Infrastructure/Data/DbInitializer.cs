@@ -31,13 +31,16 @@ public static class DbInitializer
         if (await context.Users.AnyAsync())
             return;
 
+        // Use a consistent password for all seeded users for testing
+        const string seedPassword = "Password123!";
+
         var users = new List<User>
         {
             new()
             {
                 Name = "Admin User",
                 Email = "admin@cosmetology.local",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@1234"),
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(seedPassword),
                 Role = UserRole.Admin,
                 PhoneNumber = "+1-555-0001"
             },
@@ -45,7 +48,7 @@ public static class DbInitializer
             {
                 Name = "Jane Smith",
                 Email = "jane.smith@cosmetology.local",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Cosmetologist@1234"),
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(seedPassword),
                 Role = UserRole.Cosmetologist,
                 PhoneNumber = "+1-555-0002"
             },
@@ -53,7 +56,7 @@ public static class DbInitializer
             {
                 Name = "John Doe",
                 Email = "john.doe@cosmetology.local",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Customer@1234"),
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(seedPassword),
                 Role = UserRole.Customer,
                 PhoneNumber = "+1-555-0003"
             }
