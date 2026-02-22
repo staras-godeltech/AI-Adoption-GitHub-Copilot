@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\CosmetologyBooking.Domain\CosmetologyBooking.Domain.csproj" />
+    <ProjectReference Include="..\Domain\CosmetologyBooking.Domain.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

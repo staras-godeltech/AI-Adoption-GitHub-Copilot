@@ -33,13 +33,17 @@ cosmetology-booking/
 │ ├── package.json
 │ └── vite.config.ts
 ├── backend/
-│ ├── Controllers/
-│ ├── Models/
-│ ├── Data/
-│ ├── Services/
-│ └── Program.cs
+│ ├── API/                    # Web API layer (Controllers, Program.cs)
+│ ├── Application/            # Business logic & use cases
+│ ├── Domain/                 # Core domain models & entities
+│ ├── Infrastructure/         # Data access & external services
+│ └── Tests/
+│     ├── API.Tests/
+│     ├── Application.Tests/
+│     ├── Domain.Tests/
+│     └── Infrastructure.Tests/
 └── docs/
-└── prompts.md
+    └── prompts.md
 
 ## 🤖 AI Development Approach
 

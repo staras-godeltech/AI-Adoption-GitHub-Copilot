@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\CosmetologyBooking.API\CosmetologyBooking.API.csproj" />
+    <ProjectReference Include="..\..\Domain\CosmetologyBooking.Domain.csproj" />
   </ItemGroup>
 
 </Project>

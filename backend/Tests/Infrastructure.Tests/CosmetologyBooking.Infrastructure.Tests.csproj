@@ -19,8 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\CosmetologyBooking.Application\CosmetologyBooking.Application.csproj" />
-    <ProjectReference Include="..\..\src\CosmetologyBooking.Domain\CosmetologyBooking.Domain.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\CosmetologyBooking.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Application\CosmetologyBooking.Application.csproj" />
+    <ProjectReference Include="..\..\Domain\CosmetologyBooking.Domain.csproj" />
   </ItemGroup>
 
 </Project>
