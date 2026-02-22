@@ -37,7 +37,7 @@ public static class DbInitializer
             {
                 Name = "Admin User",
                 Email = "admin@cosmetology.local",
-                PasswordHash = "admin-placeholder-hash-001",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@1234"),
                 Role = UserRole.Admin,
                 PhoneNumber = "+1-555-0001"
             },
@@ -45,7 +45,7 @@ public static class DbInitializer
             {
                 Name = "Jane Smith",
                 Email = "jane.smith@cosmetology.local",
-                PasswordHash = "cosmetologist-placeholder-hash-002",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Cosmetologist@1234"),
                 Role = UserRole.Cosmetologist,
                 PhoneNumber = "+1-555-0002"
             },
@@ -53,7 +53,7 @@ public static class DbInitializer
             {
                 Name = "John Doe",
                 Email = "john.doe@cosmetology.local",
-                PasswordHash = "customer-placeholder-hash-003",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Customer@1234"),
                 Role = UserRole.Customer,
                 PhoneNumber = "+1-555-0003"
             }
