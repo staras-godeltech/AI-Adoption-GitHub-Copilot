@@ -1,10 +1,33 @@
----
-# Source: 01_architecture_initial.md
+# AI Interaction Log
+
+Project: CosmetologyBooking  
+Architecture: Clean Architecture (Domain → Application → Infrastructure → API)  
+Documentation Purpose: Track architectural decisions and AI-assisted development  
+
+Last Updated: February 22, 2026
+
 ---
 
-# Step 1 – Initial Architecture Design
+## Table of Contents
 
-## Prompt
+1. Architecture Design Phase  
+2. Solution Scaffolding Phase  
+3. Authentication & Authorization Design  
+4. Concurrency Strategy  
+5. Repository & Mapping Strategy  
+6. Documentation & Prompt Governance  
+7. Architectural Evolution Summary  
+
+---
+
+# Phase 1 — Architecture Design
+
+## Prompt 1 — Initial High-Level Architecture
+
+### Context
+Establish the foundational architecture and requirements for the CosmetologyBooking system, ensuring scalability, separation of concerns, and best practices from the outset.
+
+### Original Prompt
 You are a senior .NET architect.
 
 I am building a production-quality application for a cosmetologist booking system.
@@ -57,14 +80,30 @@ Task:
 Do NOT generate implementation code yet.
 Focus only on architecture and design.
 
+### AI Response Summary
+This architecture ensures strict separation of concerns, clear dependency direction, and future-proofing for database and authentication changes. Business logic is encapsulated in use case classes using CQRS, and all external integrations (auth, persistence, logging) are abstracted for easy replacement. Test projects and CI pipeline are included for quality assurance.
+
+### Key Technical Decisions
+- Adopt Clean Architecture with clear separation between Domain, Application, Infrastructure, and API layers.
+- Use DTOs to avoid exposing domain entities.
+- Implement repository pattern and global exception handling.
+- Plan for role-based authorization and JWT authentication.
+
+### Risks Identified
+- Potential complexity in maintaining strict separation of concerns.
+- Risk of overengineering for a small project.
+
+### Outcome
+Established the initial architecture and project structure, setting the foundation for all subsequent design and implementation.
+
 ---
-# Source: 02_architecture_refined.md
----
 
-# Step 2 – Refined Architecture Design
+## Prompt 2 — Refined Architecture & Dependency Direction
 
-## Prompt
+### Context
+Refine the initial architecture to clarify dependency direction, introduce key abstractions, and address missing elements such as enums and authentication structure.
 
+### Original Prompt
 Refine the architecture proposal with more precision and depth.
 
 Improve the design by:
@@ -73,67 +112,44 @@ Improve the design by:
 2. Replacing Role entity with a UserRole enum if appropriate.
 3. Adding missing enums such as AppointmentStatus.
 4. Defining how authentication is structured:
-	- Where external OAuth validation lives
-	- Where JWT issuing logic lives
-	- How roles are assigned
+   - Where external OAuth validation lives
+   - Where JWT issuing logic lives
+   - How roles are assigned
 5. Explaining how business use cases are structured (e.g., Commands/Queries).
 6. Defining project structure including:
-	- Test projects
-	- CI pipeline location
+   - Test projects
+   - CI pipeline location
 7. Adjusting concurrency mitigation strategy for EF Core InMemory provider.
 8. Clarifying how the system can later replace InMemory DB with PostgreSQL without architectural changes.
 
 Do not generate code. Provide structured architectural explanation only.
 
-## AI Response Summary
-
+### AI Response Summary
 This architecture ensures strict separation of concerns, clear dependency direction, and future-proofing for database and authentication changes. Business logic is encapsulated in use case classes using CQRS, and all external integrations (auth, persistence, logging) are abstracted for easy replacement. Test projects and CI pipeline are included for quality assurance.
 
----
-# Source: 03_project_structure.md
----
+### Key Technical Decisions
+- Explicit dependency direction: Domain → Application → Infrastructure → API.
+- Replace Role entity with UserRole enum; add AppointmentStatus enum.
+- Authentication abstractions defined in Application, implemented in Infrastructure.
+- Use CQRS for business logic structuring.
+- Plan for easy database replacement (InMemory to PostgreSQL).
 
-# Step 3 – Structure Architecture Design
+### Risks Identified
+- Complexity in future database migration.
 
-## Prompt
-
-#file:prompts.md #file:copilot-instructions.md 
-Refine the architecture once more with these improvements:
-
-1. Ensure API depends only on Application layer, and Infrastructure is wired via dependency injection at composition root.
-2. Define authentication abstractions in Application layer (IExternalAuthService, ITokenService) and implementations in Infrastructure.
-3. Simplify concurrency strategy for InMemory provider to application-level availability checks.
-4. Define explicit mapping strategy (e.g., AutoMapper location and responsibility).
-5. Clarify where DTOs are located and how they are separated from domain models.
-6. Define where logging abstraction lives.
-7. Ensure use case handlers do not depend on ASP.NET types.
-
-Do not generate code. Provide final architectural structure ready for implementation.
-
-## AI Response Summary
-
-This structure ensures strict separation of concerns, clear dependency direction, and easy testability. All abstractions (repositories, authentication, logging, mapping) are defined in Application and implemented in Infrastructure. API is thin, only wiring dependencies and exposing endpoints. DTOs are separated from domain models, and mapping is abstracted. Concurrency for InMemory is handled at application level, and use case handlers remain framework-agnostic. This architecture is ready for scalable, production-quality implementation.
+### Outcome
+Clarified dependency direction, introduced key abstractions, and improved future-proofing for authentication and persistence.
 
 ---
-# Source: 04_api_scaffolding.md
----
 
-# Step 4 – API Scaffolfing
+# Phase 2 — Solution Scaffolding
 
-## Prompt
+## Prompt 3 — Solution & Project Structure Scaffolding
 
-#file:02_architecture_refined.md #file:03_project_structure.md 
-Context: We have finalized the architecture:
+### Context
+Translate the refined architecture into a concrete solution and folder structure, including all necessary projects, test projects, and CI/CD setup.
 
-- Domain → Application → Infrastructure → API
-- UserRole and AppointmentStatus enums
-- Authentication abstractions in Application, implemented in Infrastructure
-- DTOs in Application, never expose domain
-- AutoMapper mapping via Infrastructure
-- Logging via ILogger abstraction
-- Concurrency handled at Application layer
-- Use case handlers framework-agnostic
-
+### Original Prompt
 Now generate a solution scaffolding for this project. Include:
 
 - Projects for Domain, Application, Infrastructure, API
@@ -144,7 +160,7 @@ Now generate a solution scaffolding for this project. Include:
 - Ensure dependency directions are strictly maintained
 Do NOT generate implementation code yet.
 
-## AI Response Summary
+### AI Response Summary
 ## Solution Scaffolding
 
 ---
@@ -252,3 +268,117 @@ npm install
 ---
 
 **Ready for implementation. No code generated yet.**
+
+### Key Technical Decisions
+- Solution structure strictly enforces dependency direction.
+- All layers and test projects are scaffolded for maintainability.
+- CI/CD pipeline included from the start.
+
+### Outcome
+Project structure and scaffolding are ready for implementation, ensuring maintainability and clarity.
+
+---
+
+# Phase 3 — Authentication & Authorization Design
+
+## Prompt 4 — Authentication & Role Abstractions
+
+### Context
+Clarify how authentication and role management are abstracted and implemented, ensuring future extensibility and testability.
+
+### Original Prompt
+Define authentication abstractions in Application layer (IExternalAuthService, ITokenService) and implementations in Infrastructure. Replace Role entity with UserRole enum; add AppointmentStatus enum. Explain how roles are assigned and JWTs are issued.
+
+### AI Response Summary
+Authentication and role abstractions are defined in the Application layer, with implementations in Infrastructure. UserRole and AppointmentStatus enums are introduced. JWT issuing and external OAuth validation are clearly separated. Roles are assigned at authentication and persisted in tokens.
+
+### Key Technical Decisions
+- Authentication abstractions (IExternalAuthService, ITokenService) in Application.
+- JWT logic and OAuth validation in Infrastructure.
+- UserRole and AppointmentStatus enums replace previous role entity.
+
+### Outcome
+Authentication and authorization are now extensible and testable, with clear separation of concerns.
+
+---
+
+# Phase 4 — Concurrency Strategy
+
+## Prompt 5 — InMemory Provider Concurrency
+
+### Context
+Address concurrency mitigation for the EF Core InMemory provider, ensuring the system can later switch to PostgreSQL without architectural changes.
+
+### Original Prompt
+Adjust concurrency mitigation strategy for EF Core InMemory provider. Clarify how the system can later replace InMemory DB with PostgreSQL without architectural changes.
+
+### AI Response Summary
+Concurrency for InMemory is handled at the application level, allowing for seamless replacement with PostgreSQL in the future. No architectural changes required.
+
+### Key Technical Decisions
+- Application-level concurrency checks for InMemory provider.
+- No direct dependency on specific database technology.
+
+### Outcome
+System is future-proofed for database migration.
+
+---
+
+# Phase 5 — Repository & Mapping Strategy
+
+## Prompt 6 — Repository, DTO, and Mapping Isolation
+
+### Context
+Ensure repositories, DTOs, and mapping logic are properly abstracted and isolated for maintainability and testability.
+
+### Original Prompt
+Define explicit mapping strategy (e.g., AutoMapper location and responsibility). Clarify where DTOs are located and how they are separated from domain models. Define where logging abstraction lives. Ensure use case handlers do not depend on ASP.NET types.
+
+### AI Response Summary
+All abstractions (repositories, authentication, logging, mapping) are defined in Application and implemented in Infrastructure. API is thin, only wiring dependencies and exposing endpoints. DTOs are separated from domain models, and mapping is abstracted. Use case handlers remain framework-agnostic.
+
+### Key Technical Decisions
+- Mapping and logging abstractions in Application, implemented in Infrastructure.
+- DTOs never expose domain models directly.
+- Use case handlers are decoupled from ASP.NET types.
+
+### Outcome
+Improved maintainability and testability of the codebase.
+
+---
+
+# Phase 6 — Documentation & Prompt Governance
+
+## Prompt 7 — Documentation Consolidation
+
+### Context
+Consolidate all architectural prompts and AI responses into a single, well-structured documentation file for long-term governance and traceability.
+
+### Original Prompt
+Merge all prompt files into a single documentation file, preserving all technical content, summaries, and formatting. Add clear section separators and ensure nothing is lost.
+
+### AI Response Summary
+All prompt history is now consolidated in a single, well-structured document, preserving technical decisions and architectural evolution for future reference.
+
+### Key Technical Decisions
+- All prompts and AI responses are preserved in a single log.
+- Section separators and markdown formatting ensure clarity.
+
+### Outcome
+Documentation is now portfolio-ready and easy to maintain.
+
+---
+
+# Architectural Evolution Summary
+
+## Initial State
+The project began with a high-level Clean Architecture design, focusing on separation of concerns, DTO usage, and best practices for a scalable cosmetology booking system.
+
+## Refinement Stage
+Dependency direction was clarified (Domain → Application → Infrastructure → API). Key abstractions for authentication and roles were introduced, and enums replaced entity types where appropriate.
+
+## Hardening Stage
+Authentication, concurrency, and mapping strategies were isolated and abstracted, ensuring the system could evolve (e.g., swap InMemory for PostgreSQL) without architectural changes.
+
+## Governance Stage
+All prompt and architectural history was consolidated into a single, structured document, ensuring long-term maintainability and traceability for the project.
