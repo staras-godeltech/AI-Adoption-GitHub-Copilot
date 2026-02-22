@@ -16,34 +16,52 @@ A full-stack web application for cosmetology service booking, built as a demonst
 └─────────────────┘     └──────────────────┘     └─────────────────┘
 
 ### Tech Stack
-- **Frontend**: React 18, TypeScript, React Router v6, Axios, TailwindCSS
-- **Backend**: .NET 8, Minimal APIs, Entity Framework Core, SQLite
+- **Frontend**: React 19, TypeScript, Axios, TailwindCSS 4, Vite 7
+- **Backend**: .NET 10, Minimal APIs, Entity Framework Core 10, SQLite
+- **API Documentation**: Scalar (OpenAPI/Swagger alternative)
 - **IDE**: Visual Studio Code with GitHub Copilot
 
 ## 📁 Project Structure
-cosmetology-booking/
-├── frontend/
-│ ├── src/
-│ │ ├── components/
-│ │ ├── pages/
-│ │ ├── layouts/
-│ │ ├── services/
-│ │ ├── types/
-│ │ └── App.tsx
-│ ├── package.json
-│ └── vite.config.ts
+```
+AI-Adoption-GitHub-Copilot/
 ├── backend/
-│ ├── API/                    # Web API layer (Controllers, Program.cs)
-│ ├── Application/            # Business logic & use cases
-│ ├── Domain/                 # Core domain models & entities
-│ ├── Infrastructure/         # Data access & external services
-│ └── Tests/
-│     ├── API.Tests/
-│     ├── Application.Tests/
-│     ├── Domain.Tests/
-│     └── Infrastructure.Tests/
-└── docs/
-    └── prompts.md
+│   ├── API/                      # Web API layer (Minimal APIs, Program.cs)
+│   ├── Application/              # Business logic & use cases
+│   ├── Domain/                   # Core domain models & entities
+│   ├── Infrastructure/           # Data access & external services
+│   └── Tests/
+│       ├── API.Tests/
+│       ├── Application.Tests/
+│       ├── Domain.Tests/
+│       └── Infrastructure.Tests/
+├── frontend/
+│   ├── src/
+│   │   ├── components/          # Reusable UI components
+│   │   ├── layouts/             # Page layouts
+│   │   ├── pages/               # Page components
+│   │   ├── services/            # API service layer (Axios)
+│   │   ├── types/               # TypeScript type definitions
+│   │   ├── assets/              # Static assets
+│   │   ├── App.tsx              # Root component
+│   │   ├── main.tsx             # Application entry point
+│   │   └── index.css            # Global styles
+│   ├── public/                  # Public static files
+│   ├── package.json
+│   ├── vite.config.ts
+│   ├── tailwind.config.js
+│   └── tsconfig.json
+├── docs/
+│   ├── copilot-instructions.md
+│   └── prompts.md
+├── prompts/                      # Architecture & scaffolding prompts
+│   ├── 01_architecture_initial.md
+│   ├── 02_architecture_refined.md
+│   ├── 03_project_structure.md
+│   └── 04_api_scaffolding.md
+├── CosmetologyBooking.slnx       # .NET solution file
+├── README.md
+└── .gitignore
+```
 
 ## 🤖 AI Development Approach
 
@@ -93,52 +111,103 @@ This project serves as a learning exercise for AI-assisted development. The goal
 - **GitHub Copilot**: Primary code generation tool in VS Code
 - **GitHub Copilot Chat**: For architecture discussions and refinements
 - **VS Code**: Development environment
-- **MCP Servers**: (List any used during development)
-  - [Example: SQLite MCP for database management]
+- **Scalar**: Modern API documentation (replacement for Swagger UI)
+- **Axios**: HTTP client with interceptors for React
+- **TailwindCSS**: Utility-first CSS framework
+- **Vite**: Fast frontend build tool
 
 ## 💡 Insights & Recommendations
 
 ### What Worked Well
-- *To be filled during development*
+- Clean Architecture separation provides clear boundaries
+- Scalar UI provides better API documentation experience than Swagger UI
+- Axios interceptors simplify error handling across the frontend
+- TailwindCSS 4 enables rapid UI development
 
 ### What Didn't Work
-- *To be filled during development*
+- Initial Swashbuckle.AspNetCore package had compatibility issues with .NET 10
+- Solution: Migrated to Scalar.AspNetCore for API documentation
 
 ### Best Prompt Patterns
-- *To be filled during development*
+- Start with architecture decisions documented in `/prompts` folder
+- Break down work into small, testable increments
+- Use file attachments to provide context when making changes
+- Let AI handle repetitive tasks (project references, folder structure)
+
+## 📦 Current Implementation
+
+### Backend (Completed)
+- ✅ Layered architecture: API, Application, Domain, Infrastructure layers
+- ✅ Test projects for all layers
+- ✅ NuGet packages: EF Core, SQLite, Scalar
+- ✅ CORS configured for frontend (http://localhost:5173)
+- ✅ Health check endpoint (`/api/health`)
+- ✅ API documentation (`/scalar/v1`)
+- ✅ Root endpoint with API information
+
+### Frontend (Completed)
+- ✅ Clean folder structure: components, pages, layouts, services, types
+- ✅ Axios service layer with error handling
+- ✅ HealthCheck component demonstrating backend connectivity
+- ✅ TailwindCSS integration
+- ✅ TypeScript strict mode
+
+### Next Steps
+1. Define domain models (User, Service, Appointment, TimeSlot)
+2. Implement Entity Framework DbContext
+3. Create database migrations
+4. Build API endpoints for services
+5. Implement authentication (JWT)
+6. Create booking flow (frontend + backend)
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 - Node.js 18+
-- .NET 8 SDK
+- .NET 10 SDK
 - VS Code with GitHub Copilot extension
 
 ### Installation
 ```bash
 # Clone repository
 git clone [repository-url]
+cd AI-Adoption-GitHub-Copilot
 
 # Setup frontend
 cd frontend
 npm install
 npm run dev
+# Frontend will run on http://localhost:5173 (or 5174 if 5173 is in use)
 
-# Setup backend
-cd ../backend
+# Setup backend (in a new terminal)
+cd backend/API
 dotnet restore
 dotnet run
+# Backend will run on http://localhost:5000
 ```
 
+### Available Endpoints
+**Backend API (http://localhost:5000):**
+- `/` - API information and available endpoints
+- `/api/health` - Health check endpoint
+- `/scalar/v1` - Interactive API documentation (Scalar UI)
+- `/openapi/v1.json` - OpenAPI specification
+
+**Frontend (http://localhost:5173):**
+- Main application with HealthCheck component demonstrating backend connectivity
+
 ### 📊 Progress Tracking
-- Project structure setup
-- Database design
-- Authentication
-- Customer interface
-- Admin interface
-- Booking logic
-- Testing
-- Documentation
+- ✅ Project structure setup (Clean Architecture with backend/frontend separation)
+- ✅ Backend API configuration (CORS, Swagger/Scalar, health endpoints)
+- ✅ Frontend setup (React, TypeScript, TailwindCSS, Axios)
+- ✅ Frontend-Backend integration (HealthCheck component)
+- ⏳ Database design
+- ⏳ Authentication
+- ⏳ Customer interface
+- ⏳ Admin interface
+- ⏳ Booking logic
+- ⏳ Testing
+- ⏳ Documentation
 
 ### 🤝 Contributing
 This is a learning project focused on AI-assisted development. Feel free to experiment with different prompting strategies and share insights.
