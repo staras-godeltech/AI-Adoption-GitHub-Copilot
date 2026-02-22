@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Application\CosmetologyBooking.Application.csproj" />
+    <ProjectReference Include="..\Infrastructure\CosmetologyBooking.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,3 +1,5 @@
+using CosmetologyBooking.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,9 +20,9 @@ builder.Services.AddCors(options =>
     });
 });
 
-// TODO: Add SQLite DbContext here when database is configured
-// builder.Services.AddDbContext<AppDbContext>(options =>
-//     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Register EF Core DbContext with SQLite
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("Default")));
 
 var app = builder.Build();
 
@@ -29,6 +31,9 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
+
+    // Initialize and seed the database in Development
+    await DbInitializer.InitializeAsync(app.Services);
 }
 
 app.UseCors("AllowFrontend");
@@ -62,4 +67,41 @@ app.MapGet("/api/health", () => Results.Ok(new
 .WithName("HealthCheck")
 .WithTags("Health");
 
+// Services endpoint - returns seeded services to verify DB connectivity
+app.MapGet("/api/services", async (AppDbContext db) =>
+{
+    var services = await db.Services
+        .Where(s => s.IsActive)
+        .Select(s => new
+        {
+            s.Id,
+            s.Name,
+            s.Description,
+            s.DurationMinutes,
+            s.Price,
+            s.IsActive
+        })
+        .ToListAsync();
+
+    return Results.Ok(services);
+})
+.WithName("GetServices")
+.WithTags("Services");
+
+// DB diagnostic endpoint - returns counts of Users/Services/Appointments
+app.MapGet("/api/test/db", async (AppDbContext db) =>
+{
+    var counts = new
+    {
+        users = await db.Users.CountAsync(),
+        services = await db.Services.CountAsync(),
+        appointments = await db.Appointments.CountAsync(),
+        timeSlots = await db.TimeSlots.CountAsync()
+    };
+    return Results.Ok(counts);
+})
+.WithName("DbTest")
+.WithTags("Diagnostics");
+
 app.Run();
+

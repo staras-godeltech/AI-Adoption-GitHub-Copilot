@@ -1,5 +1,6 @@
 # Visual Studio / .NET
 bin/
+bin\
 obj/
 *.user
 *.suo
@@ -8,6 +9,11 @@ obj/
 *.dll
 *.exe
 .vs/
+
+# SQLite databases
+*.db
+*.db-shm
+*.db-wal
 
 # Node / React
 node_modules/
