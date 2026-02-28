@@ -4,22 +4,53 @@ using CosmetologyBooking.Application.Repositories;
 using CosmetologyBooking.Infrastructure.Data;
 using CosmetologyBooking.Infrastructure.Repositories;
 using CosmetologyBooking.Infrastructure.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.OpenApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
-using Scalar.AspNetCore;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddOpenApi("v1", options =>
+
+// Configure Swagger/OpenAPI
+builder.Services.AddSwaggerGen(options =>
 {
-    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Cosmetology Booking API",
+        Version = "v1",
+        Description = "API for managing cosmetology services, appointments, and bookings"
+    });
+
+    // Add JWT Bearer authentication to Swagger
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "JWT Authorization header using the Bearer scheme. Enter your token in the text input below."
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
 });
 
 // Configure CORS for frontend (React on port 5173)
@@ -69,14 +100,12 @@ var app = builder.Build();
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    app.MapScalarApiReference(options =>
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
     {
-        options.WithPreferredScheme("Bearer")
-               .WithHttpBearerAuthentication(bearer =>
-               {
-                   bearer.Token = "your-jwt-token-here";
-               });
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Cosmetology Booking API v1");
+        options.RoutePrefix = "swagger";
+        options.DocumentTitle = "Cosmetology Booking API";
     });
 
     // Initialize and seed the database in Development
@@ -94,12 +123,12 @@ app.MapGet("/", () => Results.Ok(new
     name = "CosmetologyBooking API",
     version = "1.0.0",
     status = "Running",
-    documentation = "/scalar/v1",
+    documentation = "/swagger",
     endpoints = new
     {
         health = "/api/health",
-        apiDocs = "/scalar/v1",
-        openApiSpec = "/openapi/v1.json"
+        apiDocs = "/swagger",
+        openApiSpec = "/swagger/v1/swagger.json"
     }
 }))
 .WithName("ApiInfo")
@@ -133,51 +162,3 @@ app.MapGet("/api/test/db", async (AppDbContext db) =>
 .WithTags("Diagnostics");
 
 app.Run();
-
-// Document transformer to add Bearer authentication scheme to OpenAPI
-internal sealed class BearerSecuritySchemeTransformer(IAuthenticationSchemeProvider authenticationSchemeProvider) : IOpenApiDocumentTransformer
-{
-    public async Task TransformAsync(OpenApiDocument document, OpenApiDocumentTransformerContext context, CancellationToken cancellationToken)
-    {
-        var authenticationSchemes = await authenticationSchemeProvider.GetAllSchemesAsync();
-        if (authenticationSchemes.Any(scheme => scheme.Name == JwtBearerDefaults.AuthenticationScheme))
-        {
-            var bearerScheme = new OpenApiSecurityScheme
-            {
-                Type = SecuritySchemeType.Http,
-                Scheme = "bearer",
-                In = ParameterLocation.Header,
-                BearerFormat = "JWT",
-                Description = "JWT Authorization header using the Bearer scheme. Enter your token in the text input below."
-            };
-
-            var schemeReference = new OpenApiSecuritySchemeReference(JwtBearerDefaults.AuthenticationScheme, document);
-            var requirements = new OpenApiSecurityRequirement
-            {
-                [schemeReference] = []
-            };
-
-            document.Components ??= new();
-            if (document.Components.SecuritySchemes == null)
-            {
-                document.Components.SecuritySchemes = new Dictionary<string, IOpenApiSecurityScheme>();
-            }
-            document.Components.SecuritySchemes[JwtBearerDefaults.AuthenticationScheme] = bearerScheme;
-
-            if (document.Paths != null)
-            {
-                foreach (var path in document.Paths.Values)
-                {
-                    if (path.Operations != null)
-                    {
-                        foreach (var operation in path.Operations.Values)
-                        {
-                            operation.Security ??= new List<OpenApiSecurityRequirement>();
-                            operation.Security.Add(requirements);
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
