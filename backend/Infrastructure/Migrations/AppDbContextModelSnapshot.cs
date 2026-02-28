@@ -23,9 +23,6 @@ namespace CosmetologyBooking.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("CosmetologistId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("CustomerId")
                         .HasColumnType("INTEGER");
 
@@ -43,8 +40,6 @@ namespace CosmetologyBooking.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CosmetologistId");
 
                     b.HasIndex("CustomerId");
 
@@ -150,11 +145,6 @@ namespace CosmetologyBooking.Infrastructure.Migrations
 
             modelBuilder.Entity("CosmetologyBooking.Domain.Entities.Appointment", b =>
                 {
-                    b.HasOne("CosmetologyBooking.Domain.Entities.User", "Cosmetologist")
-                        .WithMany("CosmetologistAppointments")
-                        .HasForeignKey("CosmetologistId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("CosmetologyBooking.Domain.Entities.User", "Customer")
                         .WithMany("CustomerAppointments")
                         .HasForeignKey("CustomerId")
@@ -166,8 +156,6 @@ namespace CosmetologyBooking.Infrastructure.Migrations
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Cosmetologist");
 
                     b.Navigation("Customer");
 
@@ -192,8 +180,6 @@ namespace CosmetologyBooking.Infrastructure.Migrations
 
             modelBuilder.Entity("CosmetologyBooking.Domain.Entities.User", b =>
                 {
-                    b.Navigation("CosmetologistAppointments");
-
                     b.Navigation("CosmetologistTimeSlots");
 
                     b.Navigation("CustomerAppointments");
