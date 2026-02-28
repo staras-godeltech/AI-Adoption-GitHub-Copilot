@@ -22,7 +22,7 @@ namespace CosmetologyBooking.Infrastructure.Migrations
                 table: "Appointments",
                 type: "TEXT",
                 nullable: false,
-                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+                defaultValueSql: "datetime('now')");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Appointments_CosmetologistId",

@@ -36,7 +36,8 @@ const ManageAppointmentsPage: React.FC = () => {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchAppointments(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // Load appointments on initial mount only; filters are applied via button click
+  useEffect(() => { fetchAppointments(); }, []); // intentional: filters applied manually via button
 
   return (
     <div>
