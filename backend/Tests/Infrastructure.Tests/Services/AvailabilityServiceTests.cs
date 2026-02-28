@@ -26,9 +26,6 @@ public class AvailabilityServiceTests
             ["BusinessHours:StartHour"] = startHour.ToString(),
             ["BusinessHours:EndHour"] = endHour.ToString(),
             ["BusinessHours:SlotIntervalMinutes"] = slotInterval.ToString(),
-            ["Jwt:Key"] = "TestSecretKey-ForUnitTests-AtLeast256BitsLong!",
-            ["Jwt:Issuer"] = "TestIssuer",
-            ["Jwt:Audience"] = "TestAudience"
         };
         return new ConfigurationBuilder().AddInMemoryCollection(settings).Build();
     }
