@@ -19,7 +19,12 @@ public class ServicesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var services = await _serviceRepository.GetAllActiveAsync();
+        // Admin and Cosmetologist users can see ALL services (including inactive)
+        // Public/Customer users only see active services
+        var isAdmin = User.IsInRole("Admin") || User.IsInRole("Cosmetologist");
+        var services = isAdmin 
+            ? await _serviceRepository.GetAllAsync() 
+            : await _serviceRepository.GetAllActiveAsync();
         return Ok(services);
     }
 
@@ -27,8 +32,15 @@ public class ServicesController : ControllerBase
     public async Task<IActionResult> GetById(int id)
     {
         var service = await _serviceRepository.GetByIdAsync(id);
-        if (service is null || !service.IsActive)
+        if (service is null)
             return NotFound();
+        
+        // Admin and Cosmetologist users can see inactive services
+        // Public/Customer users can only see active services
+        var isAdmin = User.IsInRole("Admin") || User.IsInRole("Cosmetologist");
+        if (!service.IsActive && !isAdmin)
+            return NotFound();
+        
         return Ok(service);
     }
 
