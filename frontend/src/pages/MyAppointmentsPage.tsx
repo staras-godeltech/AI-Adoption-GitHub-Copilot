@@ -41,7 +41,7 @@ const MyAppointmentsPage: React.FC = () => {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">My Appointments</h1>
         <a
-          href="/customer/book"
+          href="/customer/book-appointment"
           className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700"
         >
           + Book New
@@ -87,7 +87,7 @@ const MyAppointmentsPage: React.FC = () => {
             <h2 className="text-lg font-semibold text-gray-700 mb-3">Upcoming</h2>
             {upcoming.length === 0 ? (
               <div className="bg-white rounded-xl shadow-sm border p-6 text-gray-500">
-                No upcoming appointments. <a href="/customer/book" className="text-indigo-600 hover:underline">Book one now!</a>
+                No upcoming appointments. <a href="/customer/book-appointment" className="text-indigo-600 hover:underline">Book one now!</a>
               </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">

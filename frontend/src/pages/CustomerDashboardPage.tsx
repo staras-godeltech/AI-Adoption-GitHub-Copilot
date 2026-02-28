@@ -28,7 +28,7 @@ const CustomerDashboardPage: React.FC = () => {
 
       <div className="flex gap-4">
         <Link
-          to="/customer/book"
+          to="/customer/book-appointment"
           className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
         >
           Book New Appointment

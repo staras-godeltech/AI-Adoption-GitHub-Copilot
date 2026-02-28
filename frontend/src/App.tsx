@@ -45,7 +45,7 @@ function App() {
             <Route element={<CustomerLayout />}>
               <Route path="/customer" element={<Navigate to="/customer/dashboard" replace />} />
               <Route path="/customer/dashboard" element={<CustomerDashboardPage />} />
-              <Route path="/customer/book" element={<BookAppointmentPage />} />
+              <Route path="/customer/book-appointment" element={<BookAppointmentPage />} />
               <Route path="/customer/appointments" element={<MyAppointmentsPage />} />
             </Route>
           </Route>

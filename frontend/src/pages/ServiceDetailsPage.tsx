@@ -79,7 +79,7 @@ const ServiceDetailsPage: React.FC = () => {
             </div>
 
             <button
-              onClick={() => navigate('/customer/book')}
+              onClick={() => navigate('/customer/book-appointment')}
               className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-semibold text-lg"
             >
               Book This Service

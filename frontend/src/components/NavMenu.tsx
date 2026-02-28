@@ -54,7 +54,7 @@ const NavMenu: React.FC = () => {
           {user?.role === 'Customer' && (
             <>
               <NavLink to="/customer/dashboard" className={linkClass}>Dashboard</NavLink>
-              <NavLink to="/customer/book" className={linkClass}>Book Appointment</NavLink>
+              <NavLink to="/customer/book-appointment" className={linkClass}>Book Appointment</NavLink>
               <NavLink to="/customer/appointments" className={linkClass}>My Appointments</NavLink>
             </>
           )}
@@ -94,7 +94,7 @@ const NavMenu: React.FC = () => {
           {user?.role === 'Customer' && (
             <>
               <NavLink to="/customer/dashboard" className={linkClass} onClick={() => setMenuOpen(false)}>Dashboard</NavLink>
-              <NavLink to="/customer/book" className={linkClass} onClick={() => setMenuOpen(false)}>Book Appointment</NavLink>
+              <NavLink to="/customer/book-appointment" className={linkClass} onClick={() => setMenuOpen(false)}>Book Appointment</NavLink>
               <NavLink to="/customer/appointments" className={linkClass} onClick={() => setMenuOpen(false)}>My Appointments</NavLink>
             </>
           )}
