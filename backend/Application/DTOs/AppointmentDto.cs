@@ -35,3 +35,30 @@ public class AvailableSlotDto
     public DateTime EndTime { get; set; }
     public bool Available { get; set; }
 }
+
+public class AppointmentStatisticsDto
+{
+    public int TodayTotal { get; set; }
+    public int PendingCount { get; set; }
+    public int ConfirmedCount { get; set; }
+    public int CompletedCount { get; set; }
+    public int CancelledCount { get; set; }
+}
+
+public class CalendarAppointmentDto
+{
+    public int Id { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public DateTime Start { get; set; }
+    public DateTime End { get; set; }
+    public string Status { get; set; } = string.Empty;
+    public string CustomerName { get; set; } = string.Empty;
+    public string ServiceName { get; set; } = string.Empty;
+    public string? CosmetologistName { get; set; }
+}
+
+public class BulkStatusUpdateDto
+{
+    public int[] AppointmentIds { get; set; } = Array.Empty<int>();
+    public string NewStatus { get; set; } = string.Empty;
+}

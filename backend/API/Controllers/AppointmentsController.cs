@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Text;
 using CosmetologyBooking.Application.DTOs;
 using CosmetologyBooking.Application.Repositories;
 using CosmetologyBooking.Domain.Entities;
@@ -37,11 +38,179 @@ public class AppointmentsController : ControllerBase
     public async Task<IActionResult> GetAll(
         [FromQuery] DateTime? from,
         [FromQuery] DateTime? to,
-        [FromQuery] int? status,
-        [FromQuery] int? cosmetologistId)
+        [FromQuery] string? status,
+        [FromQuery] int? cosmetologistId,
+        [FromQuery] int? customerId)
     {
-        var appointments = await _appointmentRepository.GetAllAsync(from, to, status, cosmetologistId);
+        // Parse comma-separated statuses (e.g., "Pending,Confirmed") or numeric values
+        int[]? statuses = null;
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            var parts = status.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var parsed = new List<int>();
+            foreach (var part in parts)
+            {
+                if (int.TryParse(part, out var numericStatus))
+                    parsed.Add(numericStatus);
+                else if (Enum.TryParse<AppointmentStatus>(part, ignoreCase: true, out var namedStatus))
+                    parsed.Add((int)namedStatus);
+            }
+            if (parsed.Count > 0) statuses = parsed.ToArray();
+        }
+
+        var query = _context.Appointments
+            .Include(a => a.Customer)
+            .Include(a => a.Service)
+            .Include(a => a.Cosmetologist)
+            .AsQueryable();
+
+        if (from.HasValue) query = query.Where(a => a.StartDateTime >= from.Value);
+        if (to.HasValue) query = query.Where(a => a.StartDateTime <= to.Value);
+        if (statuses is { Length: > 0 }) query = query.Where(a => statuses.Contains((int)a.Status));
+        if (cosmetologistId.HasValue) query = query.Where(a => a.CosmetologistId == cosmetologistId.Value);
+        if (customerId.HasValue) query = query.Where(a => a.CustomerId == customerId.Value);
+
+        var appointments = await query.OrderByDescending(a => a.StartDateTime).ToListAsync();
         return Ok(appointments.Select(ToDto));
+    }
+
+    /// <summary>GET /api/appointments/statistics — Admin/Cosmetologist: dashboard metrics</summary>
+    [HttpGet("statistics")]
+    [Authorize(Roles = "Admin,Cosmetologist")]
+    public async Task<IActionResult> GetStatistics()
+    {
+        var today = DateTime.UtcNow.Date;
+        var tomorrow = today.AddDays(1);
+
+        var todayTotal = await _context.Appointments
+            .CountAsync(a => a.StartDateTime >= today && a.StartDateTime < tomorrow);
+        var pendingCount = await _context.Appointments.CountAsync(a => a.Status == AppointmentStatus.Pending);
+        var confirmedCount = await _context.Appointments.CountAsync(a => a.Status == AppointmentStatus.Confirmed);
+        var completedCount = await _context.Appointments.CountAsync(a => a.Status == AppointmentStatus.Completed);
+        var cancelledCount = await _context.Appointments.CountAsync(a => a.Status == AppointmentStatus.Cancelled);
+
+        return Ok(new AppointmentStatisticsDto
+        {
+            TodayTotal = todayTotal,
+            PendingCount = pendingCount,
+            ConfirmedCount = confirmedCount,
+            CompletedCount = completedCount,
+            CancelledCount = cancelledCount
+        });
+    }
+
+    /// <summary>GET /api/appointments/calendar — Admin/Cosmetologist: appointments for calendar view</summary>
+    [HttpGet("calendar")]
+    [Authorize(Roles = "Admin,Cosmetologist")]
+    public async Task<IActionResult> GetCalendar([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
+    {
+        var appointments = await _context.Appointments
+            .Include(a => a.Customer)
+            .Include(a => a.Service)
+            .Include(a => a.Cosmetologist)
+            .Where(a => (!startDate.HasValue || a.StartDateTime >= startDate.Value)
+                     && (!endDate.HasValue || a.StartDateTime <= endDate.Value))
+            .OrderBy(a => a.StartDateTime)
+            .ToListAsync();
+
+        var result = appointments.Select(a => new CalendarAppointmentDto
+        {
+            Id = a.Id,
+            Title = $"{a.Customer?.Name ?? "Customer"} – {a.Service?.Name ?? "Service"}",
+            Start = a.StartDateTime,
+            End = a.Service != null ? a.StartDateTime.AddMinutes(a.Service.DurationMinutes) : a.StartDateTime.AddHours(1),
+            Status = a.Status.ToString(),
+            CustomerName = a.Customer?.Name ?? string.Empty,
+            ServiceName = a.Service?.Name ?? string.Empty,
+            CosmetologistName = a.Cosmetologist?.Name
+        });
+
+        return Ok(result);
+    }
+
+    /// <summary>PUT /api/appointments/bulk-status — Admin/Cosmetologist: bulk status update</summary>
+    [HttpPut("bulk-status")]
+    [Authorize(Roles = "Admin,Cosmetologist")]
+    public async Task<IActionResult> BulkUpdateStatus([FromBody] BulkStatusUpdateDto dto)
+    {
+        if (dto.AppointmentIds is null || dto.AppointmentIds.Length == 0)
+            return BadRequest(new { message = "No appointment IDs provided." });
+
+        if (!Enum.TryParse<AppointmentStatus>(dto.NewStatus, ignoreCase: true, out var newStatus))
+            return BadRequest(new { message = $"Invalid status: {dto.NewStatus}. Valid values: Pending, Confirmed, Completed, Cancelled." });
+
+        var appointments = await _context.Appointments
+            .Where(a => dto.AppointmentIds.Contains(a.Id))
+            .ToListAsync();
+
+        if (appointments.Count != dto.AppointmentIds.Length)
+            return BadRequest(new { message = "One or more appointment IDs were not found." });
+
+        var invalidTransitions = appointments.Where(a =>
+        {
+            var valid = (a.Status, newStatus) switch
+            {
+                (AppointmentStatus.Pending, AppointmentStatus.Confirmed) => true,
+                (AppointmentStatus.Confirmed, AppointmentStatus.Completed) => true,
+                (AppointmentStatus.Pending, AppointmentStatus.Cancelled) => true,
+                (AppointmentStatus.Confirmed, AppointmentStatus.Cancelled) => true,
+                _ => false
+            };
+            return !valid;
+        }).ToList();
+
+        if (invalidTransitions.Count > 0)
+        {
+            var ids = string.Join(", ", invalidTransitions.Select(a => a.Id));
+            return BadRequest(new { message = $"Invalid status transition for appointments: {ids}." });
+        }
+
+        foreach (var appointment in appointments)
+            appointment.Status = newStatus;
+
+        await _context.SaveChangesAsync();
+        return Ok(new { updated = appointments.Count });
+    }
+
+    /// <summary>GET /api/appointments/export — Admin/Cosmetologist: export appointments as CSV</summary>
+    [HttpGet("export")]
+    [Authorize(Roles = "Admin,Cosmetologist")]
+    public async Task<IActionResult> Export(
+        [FromQuery] DateTime? startDate,
+        [FromQuery] DateTime? endDate,
+        [FromQuery] string format = "csv")
+    {
+        var query = _context.Appointments
+            .Include(a => a.Customer)
+            .Include(a => a.Service)
+            .Include(a => a.Cosmetologist)
+            .AsQueryable();
+
+        if (startDate.HasValue) query = query.Where(a => a.StartDateTime >= startDate.Value);
+        if (endDate.HasValue) query = query.Where(a => a.StartDateTime <= endDate.Value);
+
+        var appointments = await query.OrderBy(a => a.StartDateTime).ToListAsync();
+
+        var csv = new StringBuilder();
+        csv.AppendLine("Id,Date,Customer,Service,Cosmetologist,Duration (min),Status,Notes,Created At");
+
+        foreach (var a in appointments)
+        {
+            var cosmetologist = a.Cosmetologist?.Name ?? "";
+            var notes = (a.Notes ?? "").Replace("\"", "\"\"").Replace("\r\n", " ").Replace("\n", " ").Replace("\r", " ");
+            csv.AppendLine($"{a.Id}," +
+                           $"{a.StartDateTime:yyyy-MM-dd HH:mm}," +
+                           $"\"{a.Customer?.Name ?? ""}\"," +
+                           $"\"{a.Service?.Name ?? ""}\"," +
+                           $"\"{cosmetologist}\"," +
+                           $"{a.Service?.DurationMinutes ?? 0}," +
+                           $"{a.Status}," +
+                           $"\"{notes}\"," +
+                           $"{a.CreatedAt:yyyy-MM-dd HH:mm}");
+        }
+
+        var bytes = Encoding.UTF8.GetBytes(csv.ToString());
+        return File(bytes, "text/csv", $"appointments-{DateTime.UtcNow:yyyyMMdd}.csv");
     }
 
     /// <summary>GET /api/appointments/my — Customer: current user's appointments</summary>
