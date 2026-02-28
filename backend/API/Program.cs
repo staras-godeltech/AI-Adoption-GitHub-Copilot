@@ -167,3 +167,6 @@ app.MapGet("/api/test/db", async (AppDbContext db) =>
 .WithTags("Diagnostics");
 
 app.Run();
+
+// Expose Program class for integration tests
+public partial class Program { }
