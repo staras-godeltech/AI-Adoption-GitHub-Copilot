@@ -54,15 +54,35 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// Configure CORS for frontend (React on port 5173)
+// Configure CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend", policy =>
+    if (builder.Environment.IsDevelopment())
     {
-        policy.WithOrigins("http://localhost:5173")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
+        options.AddPolicy("AllowFrontend", policy =>
+        {
+            policy.WithOrigins("http://localhost:5173", "http://localhost:5174")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+    }
+    else
+    {
+        var allowedOrigins = builder.Configuration["CORS_ALLOWED_ORIGINS"]?.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            ?? [];
+        if (allowedOrigins.Length == 0)
+        {
+            throw new InvalidOperationException(
+                "CORS_ALLOWED_ORIGINS environment variable must be configured in production. " +
+                "Set it to a comma-separated list of allowed frontend origins.");
+        }
+        options.AddPolicy("AllowFrontend", policy =>
+        {
+            policy.WithOrigins(allowedOrigins)
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+    }
 });
 
 // Register EF Core DbContext with SQLite
@@ -103,6 +123,11 @@ builder.Services.AddAuthorization();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -115,6 +140,16 @@ if (app.Environment.IsDevelopment())
 
     // Initialize and seed the database in Development
     await DbInitializer.InitializeAsync(app.Services);
+}
+else
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Cosmetology Booking API v1");
+        options.RoutePrefix = "swagger";
+        options.DocumentTitle = "Cosmetology Booking API";
+    });
 }
 
 app.UseCors("AllowFrontend");
