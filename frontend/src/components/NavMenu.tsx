@@ -9,7 +9,7 @@ const NavMenu: React.FC = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -54,13 +54,16 @@ const NavMenu: React.FC = () => {
           {user?.role === 'Customer' && (
             <>
               <NavLink to="/customer/dashboard" className={linkClass}>Dashboard</NavLink>
+              <NavLink to="/customer/book" className={linkClass}>Book Appointment</NavLink>
               <NavLink to="/customer/appointments" className={linkClass}>My Appointments</NavLink>
             </>
           )}
 
-          {user?.role === 'Admin' && (
+          {(user?.role === 'Admin' || user?.role === 'Cosmetologist') && (
             <>
-              <NavLink to="/admin/dashboard" className={linkClass}>Admin</NavLink>
+              <NavLink to="/admin/dashboard" className={linkClass}>Dashboard</NavLink>
+              <NavLink to="/admin/appointments" className={linkClass}>Manage Appointments</NavLink>
+              <NavLink to="/admin/services" className={linkClass}>Manage Services</NavLink>
             </>
           )}
 
@@ -91,12 +94,17 @@ const NavMenu: React.FC = () => {
           {user?.role === 'Customer' && (
             <>
               <NavLink to="/customer/dashboard" className={linkClass} onClick={() => setMenuOpen(false)}>Dashboard</NavLink>
+              <NavLink to="/customer/book" className={linkClass} onClick={() => setMenuOpen(false)}>Book Appointment</NavLink>
               <NavLink to="/customer/appointments" className={linkClass} onClick={() => setMenuOpen(false)}>My Appointments</NavLink>
             </>
           )}
 
-          {user?.role === 'Admin' && (
-            <NavLink to="/admin/dashboard" className={linkClass} onClick={() => setMenuOpen(false)}>Admin</NavLink>
+          {(user?.role === 'Admin' || user?.role === 'Cosmetologist') && (
+            <>
+              <NavLink to="/admin/dashboard" className={linkClass} onClick={() => setMenuOpen(false)}>Dashboard</NavLink>
+              <NavLink to="/admin/appointments" className={linkClass} onClick={() => setMenuOpen(false)}>Manage Appointments</NavLink>
+              <NavLink to="/admin/services" className={linkClass} onClick={() => setMenuOpen(false)}>Manage Services</NavLink>
+            </>
           )}
 
           {user && (

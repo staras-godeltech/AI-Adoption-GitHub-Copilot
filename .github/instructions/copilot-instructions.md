@@ -178,3 +178,36 @@ When generating code:
 - Generate production-quality, maintainable code.
 
 If a request conflicts with architecture rules, follow architecture rules.
+
+---
+
+## Auto-Logging Requirements
+
+The agent MUST automatically log every prompt used in `docs/prompts.md` in the following format:
+
+### When starting a new prompt:
+1. Ask user: "Should I log this prompt to prompts.md?"
+2. If yes, add entry with:
+   - Date (YYYY-MM-DD)
+   - The exact prompt used
+   - "In progress" as initial result
+   - Empty changes field
+
+### When completing a task:
+1. Ask user: "What was the result and any changes made?"
+2. Update the prompt entry with:
+   - Result summary
+   - Changes made
+   - Any issues encountered
+
+### For follow-up prompts:
+1. Always check if there's an existing entry for current task
+2. Update the same entry or create new one as appropriate
+3. Maintain chronological order in prompts.md
+
+### Example format:
+```markdown
+| Date | Prompt | Result | Changes Made |
+|------|--------|--------|--------------|
+| 2024-02-28 | "Initial setup prompt..." | AuthContext created | Added token storage |
+```
