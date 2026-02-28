@@ -19,6 +19,9 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
         builder.Property(a => a.Notes)
             .HasMaxLength(1000);
 
+        builder.Property(a => a.CreatedAt)
+            .IsRequired();
+
         // EndDateTime is computed; ignore it in persistence
         builder.Ignore(a => a.EndDateTime);
 
@@ -31,5 +34,11 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
             .WithMany(s => s.Appointments)
             .HasForeignKey(a => a.ServiceId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(a => a.Cosmetologist)
+            .WithMany(u => u.CosmetologistAppointments)
+            .HasForeignKey(a => a.CosmetologistId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired(false);
     }
 }
