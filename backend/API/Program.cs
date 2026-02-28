@@ -1,6 +1,8 @@
 using System.Text;
 using CosmetologyBooking.Application.Auth.Interfaces;
+using CosmetologyBooking.Application.Repositories;
 using CosmetologyBooking.Infrastructure.Data;
+using CosmetologyBooking.Infrastructure.Repositories;
 using CosmetologyBooking.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -37,6 +39,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Register AuthService
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+// Register ServiceRepository
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 
 // Configure JWT authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
@@ -110,27 +115,6 @@ app.MapGet("/api/health", () => Results.Ok(new
 }))
 .WithName("HealthCheck")
 .WithTags("Health");
-
-// Services endpoint - returns seeded services to verify DB connectivity
-app.MapGet("/api/services", async (AppDbContext db) =>
-{
-    var services = await db.Services
-        .Where(s => s.IsActive)
-        .Select(s => new
-        {
-            s.Id,
-            s.Name,
-            s.Description,
-            s.DurationMinutes,
-            s.Price,
-            s.IsActive
-        })
-        .ToListAsync();
-
-    return Results.Ok(services);
-})
-.WithName("GetServices")
-.WithTags("Services");
 
 // DB diagnostic endpoint - returns counts of Users/Services/Appointments
 app.MapGet("/api/test/db", async (AppDbContext db) =>

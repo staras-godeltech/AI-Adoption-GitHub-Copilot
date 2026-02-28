@@ -10,6 +10,7 @@ import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import ServicesPage from './pages/ServicesPage'
+import ServiceDetailsPage from './pages/ServiceDetailsPage'
 
 import CustomerDashboardPage from './pages/CustomerDashboardPage'
 import BookAppointmentPage from './pages/BookAppointmentPage'
@@ -18,6 +19,8 @@ import MyAppointmentsPage from './pages/MyAppointmentsPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
 import ManageAppointmentsPage from './pages/ManageAppointmentsPage'
 import ManageServicesPage from './pages/ManageServicesPage'
+import CreateServicePage from './pages/CreateServicePage'
+import EditServicePage from './pages/EditServicePage'
 
 import NotFoundPage from './pages/NotFoundPage'
 import UnauthorizedPage from './pages/UnauthorizedPage'
@@ -33,6 +36,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/services" element={<ServicesPage />} />
+            <Route path="/services/:id" element={<ServiceDetailsPage />} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
           </Route>
 
@@ -53,6 +57,8 @@ function App() {
               <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
               <Route path="/admin/appointments" element={<ManageAppointmentsPage />} />
               <Route path="/admin/services" element={<ManageServicesPage />} />
+              <Route path="/admin/services/new" element={<CreateServicePage />} />
+              <Route path="/admin/services/:id/edit" element={<EditServicePage />} />
             </Route>
           </Route>
 
