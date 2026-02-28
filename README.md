@@ -1,216 +1,394 @@
-# Cosmetology Booking App - AI-Powered Development Project
+# Cosmetology Booking App
 
-## 📋 Overview
-A full-stack web application for cosmetology service booking, built as a demonstration of AI-assisted development using GitHub Copilot. The application enables customers to browse services, view availability, and book appointments, while cosmetologists can manage and moderate all bookings.
+[![Tests](https://github.com/staras-godeltech/AI-Adoption-GitHub-Copilot/actions/workflows/tests.yml/badge.svg)](https://github.com/staras-godeltech/AI-Adoption-GitHub-Copilot/actions/workflows/tests.yml)
+![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-06B6D4?logo=tailwindcss)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-### Core Features
-- **Customer-facing interface**: Browse services, view available time slots, book appointments
-- **Cosmetologist dashboard**: View all bookings, approve/reject appointments, manage schedule
-- **User authentication**: Separate flows for customers and cosmetologists
-- **Responsive design**: Mobile-friendly UI built with React
+A full-stack web application for cosmetology service booking, built as a demonstration of AI-assisted development using GitHub Copilot. This project showcases Clean Architecture principles with a .NET 10 backend and a React 19 frontend.
 
-## 🏗️ Architecture
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│ React UI        │────>│ .NET API         │────>│ SQLite          │
-│ (Vite)          │<────│ (Minimal APIs)   │<────│ Database        │
-└─────────────────┘     └──────────────────┘     └─────────────────┘
+---
 
-### Tech Stack
-- **Frontend**: React 19, TypeScript, Axios, TailwindCSS 4, Vite 7
-- **Backend**: .NET 10, Minimal APIs, Entity Framework Core 10, SQLite
-- **API Documentation**: Scalar (OpenAPI/Swagger alternative)
-- **IDE**: Visual Studio Code with GitHub Copilot
+## Table of Contents
 
-## 📁 Project Structure
+- [Project Overview](#project-overview)
+- [Key Features](#key-features)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Project Structure](#project-structure)
+- [Setup Instructions](#setup-instructions)
+- [Environment Variables](#environment-variables)
+- [API Documentation](#api-documentation)
+- [Testing](#testing)
+- [Screenshots](#screenshots)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## Project Overview
+
+This application enables:
+- **Customers** to browse cosmetology services, view available time slots, book appointments, and manage their bookings.
+- **Administrators (Cosmetologists)** to manage services, view all appointments, update statuses, and use the admin dashboard with calendar and export features.
+
+The project was built with **90%+ AI-generated code** using GitHub Copilot, documenting all prompts and AI interactions in [`docs/prompts.md`](docs/prompts.md).
+
+---
+
+## Key Features
+
+### Customer Features
+- Register and log in with JWT authentication
+- Browse and filter available cosmetology services
+- Book appointments with date/time selection and availability checking
+- View, manage, and cancel their own appointments
+
+### Admin Features
+- Secure admin login with role-based authorization
+- Full service management (create, edit, deactivate)
+- Appointment management with status updates (Pending, Confirmed, Cancelled, Completed)
+- Calendar view of all appointments
+- Bulk appointment actions
+- Export appointments to CSV
+
+### Technical Features
+- Clean Architecture (Domain → Application → Infrastructure → API)
+- JWT authentication with role-based authorization
+- Swagger UI for interactive API documentation
+- SQLite for development, PostgreSQL for production
+- Docker and docker-compose support
+- GitHub Actions CI/CD pipeline
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend Framework | React 19 + TypeScript 5.9 |
+| Frontend Build | Vite 7 |
+| Styling | TailwindCSS 3.4 |
+| HTTP Client | Axios |
+| Backend Framework | .NET 10 (ASP.NET Core) |
+| API Style | RESTful Controllers |
+| ORM | Entity Framework Core 10 |
+| Dev Database | SQLite |
+| Prod Database | PostgreSQL |
+| Authentication | JWT Bearer Tokens |
+| API Documentation | Swagger UI (Swashbuckle) |
+| Backend Testing | xUnit + WebApplicationFactory |
+| Frontend Testing | Vitest + Testing Library |
+| CI/CD | GitHub Actions |
+| Containerization | Docker + docker-compose |
+
+---
+
+## Architecture
+
+This project follows **Clean Architecture** with strict dependency inversion:
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                         API Layer                            │
+│          (Controllers, Middleware, Program.cs)               │
+│              Depends on: Application                         │
+├──────────────────────────────────────────────────────────────┤
+│                    Application Layer                         │
+│        (Use Cases, DTOs, Repository Interfaces,              │
+│                  Service Interfaces)                         │
+│              Depends on: Domain                              │
+├──────────────────────────────────────────────────────────────┤
+│                   Infrastructure Layer                       │
+│         (EF Core DbContext, Repositories, AuthService,       │
+│                  Migrations, Seeding)                        │
+│            Depends on: Application, Domain                   │
+├──────────────────────────────────────────────────────────────┤
+│                      Domain Layer                            │
+│           (Entities, Enums - no dependencies)                │
+└──────────────────────────────────────────────────────────────┘
+
+        React Frontend ──HTTP──> .NET API ──EF Core──> SQLite/PostgreSQL
+```
+
+**Dependency Direction:** Domain ← Application ← Infrastructure ← API
+
+See [`docs/architecture.md`](docs/architecture.md) for detailed diagrams.
+
+---
+
+## Project Structure
+
 ```
 AI-Adoption-GitHub-Copilot/
 ├── backend/
-│   ├── API/                      # Web API layer (Minimal APIs, Program.cs)
-│   ├── Application/              # Business logic & use cases
-│   ├── Domain/                   # Core domain models & entities
-│   ├── Infrastructure/           # Data access & external services
+│   ├── API/                         # ASP.NET Core Web API
+│   │   ├── Controllers/             # API controllers
+│   │   ├── Program.cs               # App configuration & startup
+│   │   ├── appsettings.json         # Base configuration
+│   │   ├── appsettings.Development.json
+│   │   └── appsettings.Production.json
+│   ├── Application/                 # Business logic layer
+│   │   ├── Auth/                    # Authentication interfaces & DTOs
+│   │   ├── Repositories/            # Repository interfaces
+│   │   ├── Services/                # Service interfaces
+│   │   └── DTOs/                    # Data transfer objects
+│   ├── Domain/                      # Core domain models
+│   │   ├── Entities/                # Domain entities
+│   │   └── Enums/                   # Domain enumerations
+│   ├── Infrastructure/              # Data access implementation
+│   │   ├── Data/                    # DbContext & seeding
+│   │   ├── Migrations/              # EF Core migrations
+│   │   ├── Repositories/            # Repository implementations
+│   │   └── Services/                # Service implementations
 │   └── Tests/
-│       ├── API.Tests/
-│       ├── Application.Tests/
-│       ├── Domain.Tests/
-│       └── Infrastructure.Tests/
+│       ├── API.Tests/               # Integration tests
+│       ├── Application.Tests/       # Unit tests
+│       ├── Domain.Tests/            # Unit tests
+│       └── Infrastructure.Tests/    # Unit tests
 ├── frontend/
 │   ├── src/
-│   │   ├── components/          # Reusable UI components
-│   │   ├── layouts/             # Page layouts
-│   │   ├── pages/               # Page components
-│   │   ├── services/            # API service layer (Axios)
-│   │   ├── types/               # TypeScript type definitions
-│   │   ├── assets/              # Static assets
-│   │   ├── App.tsx              # Root component
-│   │   ├── main.tsx             # Application entry point
-│   │   └── index.css            # Global styles
-│   ├── public/                  # Public static files
-│   ├── package.json
+│   │   ├── components/              # Reusable UI components
+│   │   ├── contexts/                # React contexts (Auth)
+│   │   ├── layouts/                 # Page layouts
+│   │   ├── pages/                   # Page components
+│   │   ├── services/                # Axios API service layer
+│   │   └── types/                   # TypeScript type definitions
+│   ├── .env.example                 # Environment variable template
+│   ├── .env.production              # Production environment variables
 │   ├── vite.config.ts
-│   ├── tailwind.config.js
-│   └── tsconfig.json
+│   └── package.json
 ├── docs/
-│   ├── copilot-instructions.md
-│   └── prompts.md
-├── prompts/                      # Architecture & scaffolding prompts
-│   ├── 01_architecture_initial.md
-│   ├── 02_architecture_refined.md
-│   ├── 03_project_structure.md
-│   └── 04_api_scaffolding.md
-├── CosmetologyBooking.slnx       # .NET solution file
-├── README.md
-└── .gitignore
+│   ├── prompts.md                   # Complete AI prompt log
+│   ├── architecture.md              # Architecture diagrams
+│   ├── user-guide.md                # Customer user guide
+│   ├── admin-guide.md               # Admin/cosmetologist guide
+│   └── deployment.md                # Deployment instructions
+├── Dockerfile                       # Backend Docker image
+├── docker-compose.yml               # Full stack docker-compose
+├── CosmetologyBooking.slnx
+└── README.md
 ```
 
-## 🤖 AI Development Approach
+---
 
-### Development Philosophy
-This project serves as a learning exercise for AI-assisted development. The goal is to have **90%+ of code generated by AI tools**, with the developer acting primarily as a reviewer and orchestrator.
-
-### Prompt Strategy
-1. **Architecture first**: Get AI to propose overall structure
-2. **Component by component**: Build incrementally with clear prompts
-3. **Test-driven**: Generate tests alongside implementation
-4. **Iterative refinement**: Use follow-up prompts to improve generated code
-
-## 📝 Prompt Log (To Be Filled During Development)
-
-### Phase 1: Project Setup & Architecture
-| Step | Prompt | Result | Notes |
-|------|--------|--------|-------|
-| 1 | "Create a React + TypeScript project structure for a cosmetology booking app with Vite" | | |
-| 2 | "Design a .NET 8 Minimal API with Entity Framework Core for a booking system" | | |
-| 3 | "Generate database models for User, Service, Appointment, and TimeSlot" | | |
-
-### Phase 2: Frontend Development
-| Step | Prompt | Result | Notes |
-|------|--------|--------|-------|
-| 4 | "Create a responsive Navbar component with React and TailwindCSS" | | |
-| 5 | "Implement React Router with MainLayout and AdminLayout" | | |
-| 6 | "Build a ServiceList component that fetches and displays services from API" | | |
-| 7 | "Create a BookingForm with date/time picker and form validation" | | |
-
-### Phase 3: Backend Development
-| Step | Prompt | Result | Notes |
-|------|--------|--------|-------|
-| 8 | "Create Entity Framework Core DbContext and migrations" | | |
-| 9 | "Implement JWT authentication for customers and cosmetologists" | | |
-| 10 | "Build API endpoints for service management" | | |
-| 11 | "Create booking endpoints with availability checking" | | |
-
-### Phase 4: Integration & Polish
-| Step | Prompt | Result | Notes |
-|------|--------|--------|-------|
-| 12 | "Connect React forms to API endpoints using Axios" | | |
-| 13 | "Add error handling and loading states" | | |
-| 14 | "Generate unit tests for critical components" | | |
-| 15 | "Create deployment configuration" | | |
-
-## 🛠️ Tools & Models Used
-- **GitHub Copilot**: Primary code generation tool in VS Code
-- **GitHub Copilot Chat**: For architecture discussions and refinements
-- **VS Code**: Development environment
-- **Scalar**: Modern API documentation (replacement for Swagger UI)
-- **Axios**: HTTP client with interceptors for React
-- **TailwindCSS**: Utility-first CSS framework
-- **Vite**: Fast frontend build tool
-
-## 💡 Insights & Recommendations
-
-### What Worked Well
-- Clean Architecture separation provides clear boundaries
-- Scalar UI provides better API documentation experience than Swagger UI
-- Axios interceptors simplify error handling across the frontend
-- TailwindCSS 4 enables rapid UI development
-
-### What Didn't Work
-- Initial Swashbuckle.AspNetCore package had compatibility issues with .NET 10
-- Solution: Migrated to Scalar.AspNetCore for API documentation
-
-### Best Prompt Patterns
-- Start with architecture decisions documented in `/prompts` folder
-- Break down work into small, testable increments
-- Use file attachments to provide context when making changes
-- Let AI handle repetitive tasks (project references, folder structure)
-
-## 📦 Current Implementation
-
-### Backend (Completed)
-- ✅ Layered architecture: API, Application, Domain, Infrastructure layers
-- ✅ Test projects for all layers
-- ✅ NuGet packages: EF Core, SQLite, Scalar
-- ✅ CORS configured for frontend (http://localhost:5173)
-- ✅ Health check endpoint (`/api/health`)
-- ✅ API documentation (`/scalar/v1`)
-- ✅ Root endpoint with API information
-
-### Frontend (Completed)
-- ✅ Clean folder structure: components, pages, layouts, services, types
-- ✅ Axios service layer with error handling
-- ✅ HealthCheck component demonstrating backend connectivity
-- ✅ TailwindCSS integration
-- ✅ TypeScript strict mode
-
-### Next Steps
-1. Define domain models (User, Service, Appointment, TimeSlot)
-2. Implement Entity Framework DbContext
-3. Create database migrations
-4. Build API endpoints for services
-5. Implement authentication (JWT)
-6. Create booking flow (frontend + backend)
-
-## 🚀 Getting Started
+## Setup Instructions
 
 ### Prerequisites
-- Node.js 18+
-- .NET 10 SDK
-- VS Code with GitHub Copilot extension
 
-### Installation
+- [Node.js 20+](https://nodejs.org/)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- [Git](https://git-scm.com/)
+
+### 1. Clone the Repository
+
 ```bash
-# Clone repository
-git clone [repository-url]
+git clone https://github.com/staras-godeltech/AI-Adoption-GitHub-Copilot.git
 cd AI-Adoption-GitHub-Copilot
-
-# Setup frontend
-cd frontend
-npm install
-npm run dev
-# Frontend will run on http://localhost:5173 (or 5174 if 5173 is in use)
-
-# Setup backend (in a new terminal)
-cd backend/API
-dotnet restore
-dotnet run
-# Backend will run on http://localhost:5000
 ```
 
-### Available Endpoints
-**Backend API (http://localhost:5000):**
-- `/` - API information and available endpoints
-- `/api/health` - Health check endpoint
-- `/scalar/v1` - Interactive API documentation (Scalar UI)
-- `/openapi/v1.json` - OpenAPI specification
+### 2. Backend Setup
 
-**Frontend (http://localhost:5173):**
-- Main application with HealthCheck component demonstrating backend connectivity
+```bash
+# Restore NuGet packages
+dotnet restore
 
-### 📊 Progress Tracking
-- ✅ Project structure setup (Clean Architecture with backend/frontend separation)
-- ✅ Backend API configuration (CORS, Swagger/Scalar, health endpoints)
-- ✅ Frontend setup (React, TypeScript, TailwindCSS, Axios)
-- ✅ Frontend-Backend integration (HealthCheck component)
-- ⏳ Database design
-- ⏳ Authentication
-- ⏳ Customer interface
-- ⏳ Admin interface
-- ⏳ Booking logic
-- ⏳ Testing
-- ⏳ Documentation
+# Run the API (from the repo root)
+cd backend/API
+dotnet run
+# Backend starts at http://localhost:5000
+# Swagger UI: http://localhost:5000/swagger
+```
 
-### 🤝 Contributing
-This is a learning project focused on AI-assisted development. Feel free to experiment with different prompting strategies and share insights.
+The SQLite database (`cosmetology.db`) is created and seeded automatically on first run.
 
-### 📄 License
-MIT
+### 3. Frontend Setup
+
+```bash
+# In a new terminal, from the repo root
+cd frontend
+
+# Copy environment variables template
+cp .env.example .env
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+# Frontend starts at http://localhost:5173
+```
+
+### 4. Using Docker (Alternative)
+
+```bash
+# Start the full stack with docker-compose
+docker-compose up --build
+# API: http://localhost:8080
+# Frontend: http://localhost:5173 (run separately with npm run dev)
+```
+
+### Default Credentials
+
+After the database is seeded, you can log in with:
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | admin@cosmetology.com | Admin123! |
+| Customer | customer@example.com | Customer123! |
+
+---
+
+## Environment Variables
+
+### Backend
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `ConnectionStrings__Default` | SQLite or PostgreSQL connection string | `Data Source=cosmetology.db` |
+| `Jwt__Key` | JWT signing secret (min 32 chars) | See appsettings.json |
+| `Jwt__Issuer` | JWT issuer | `CosmetologyBooking.API` |
+| `Jwt__Audience` | JWT audience | `CosmetologyBooking.Client` |
+| `Jwt__ExpiryHours` | Token expiry in hours | `24` |
+| `CORS_ALLOWED_ORIGINS` | Comma-separated allowed origins for production | — |
+
+### Frontend
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `VITE_API_URL` | Backend API base URL | `http://localhost:5000` |
+
+See [`frontend/.env.example`](frontend/.env.example) for a complete template.
+
+---
+
+## API Documentation
+
+When the backend is running, Swagger UI is available at:
+
+**Development:** `http://localhost:5000/swagger`
+
+The OpenAPI specification is available at: `http://localhost:5000/swagger/v1/swagger.json`
+
+### Key Endpoints
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/api/auth/register` | Register a new customer | None |
+| POST | `/api/auth/login` | Log in and receive JWT | None |
+| GET | `/api/services` | List all active services | None |
+| POST | `/api/services` | Create a new service | Admin |
+| GET | `/api/appointments` | List appointments | Customer/Admin |
+| POST | `/api/appointments` | Book an appointment | Customer |
+| PUT | `/api/appointments/{id}/status` | Update appointment status | Admin |
+| GET | `/api/health` | Health check | None |
+
+---
+
+## Testing
+
+### Backend Tests
+
+```bash
+# Run all backend tests from the repo root
+dotnet test
+
+# Run specific test project
+dotnet test backend/Tests/Domain.Tests/
+dotnet test backend/Tests/Application.Tests/
+dotnet test backend/Tests/Infrastructure.Tests/
+dotnet test backend/Tests/API.Tests/
+```
+
+### Frontend Tests
+
+```bash
+cd frontend
+
+# Run tests once
+npm run test:run
+
+# Run tests in watch mode
+npm test
+
+# Run with coverage report
+npm run coverage
+```
+
+---
+
+## Screenshots
+
+### Home Page
+*The main landing page with service highlights and call-to-action.*
+
+![Home Page](docs/screenshots/home.png)
+
+### Services Page
+*Browse all available cosmetology services with filtering.*
+
+![Services Page](docs/screenshots/services.png)
+
+### Book Appointment
+*Step-by-step booking flow with date/time selection.*
+
+![Book Appointment](docs/screenshots/booking.png)
+
+### Admin Dashboard
+*Comprehensive admin dashboard with appointment management.*
+
+![Admin Dashboard](docs/screenshots/admin.png)
+
+---
+
+## Deployment
+
+See [`docs/deployment.md`](docs/deployment.md) for complete instructions on:
+- Deploying the backend to Render.com
+- Deploying the frontend to Vercel
+- Setting up PostgreSQL in production
+- Configuring environment variables
+
+Quick production build:
+
+```bash
+# Build frontend for production
+cd frontend
+npm run build
+# Output in frontend/dist/
+
+# Build backend Docker image
+docker build -t cosmetology-api .
+docker run -p 8080:8080 -e JWT__KEY=your-secret cosmetology-api
+```
+
+---
+
+## AI Development
+
+This project was built with **90%+ AI-generated code** using GitHub Copilot.
+
+- Complete AI prompt log: [`docs/prompts.md`](docs/prompts.md)
+- Architecture decisions and AI interactions documented for all issues #1-#10
+
+---
+
+## Contributing
+
+This is a learning project focused on AI-assisted development. Contributions are welcome:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/my-feature`)
+3. Commit your changes (`git commit -m 'Add my feature'`)
+4. Push to the branch (`git push origin feature/my-feature`)
+5. Open a Pull Request
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.

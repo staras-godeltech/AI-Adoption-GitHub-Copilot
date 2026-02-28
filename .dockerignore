@@ -1,0 +1,33 @@
+# Git
+.git
+.gitignore
+
+# .NET build output
+**/bin/
+**/obj/
+**/*.user
+
+# Test projects (not needed in production image)
+backend/Tests/
+
+# SQLite database files
+*.db
+*.db-shm
+*.db-wal
+
+# Frontend (built separately)
+frontend/
+
+# Documentation
+docs/
+README.md
+*.md
+
+# IDE files
+.vscode/
+.vs/
+*.suo
+
+# Environment files
+.env
+.env.*
