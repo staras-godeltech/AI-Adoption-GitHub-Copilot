@@ -1,6 +1,7 @@
 using System.Text;
 using CosmetologyBooking.Application.Auth.Interfaces;
 using CosmetologyBooking.Application.Repositories;
+using CosmetologyBooking.Application.Services;
 using CosmetologyBooking.Infrastructure.Data;
 using CosmetologyBooking.Infrastructure.Repositories;
 using CosmetologyBooking.Infrastructure.Services;
@@ -73,6 +74,10 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Register ServiceRepository
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+
+// Register AppointmentRepository and AvailabilityService
+builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+builder.Services.AddScoped<IAvailabilityService, AvailabilityService>();
 
 // Configure JWT authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");

@@ -44,4 +44,21 @@ public class UsersController : ControllerBase
 
         return Ok(user);
     }
+
+    [HttpGet("cosmetologists")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetCosmetologists()
+    {
+        var cosmetologists = await _context.Users
+            .Where(u => u.Role == Domain.Enums.UserRole.Cosmetologist)
+            .Select(u => new
+            {
+                u.Id,
+                u.Name,
+                u.Email
+            })
+            .ToListAsync();
+
+        return Ok(cosmetologists);
+    }
 }
