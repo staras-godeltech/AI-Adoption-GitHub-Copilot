@@ -1,6 +1,5 @@
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import React from 'react';
 import { AuthProvider, useAuth } from '../../contexts/AuthContext';
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';

@@ -4,7 +4,6 @@ import { MemoryRouter } from 'react-router-dom';
 import NavMenu from '../../components/NavMenu';
 import type { AuthUser } from '../../contexts/AuthContext';
 import AuthContext from '../../contexts/AuthContext';
-import React from 'react';
 
 const mockLogout = vi.fn();
 const mockLogin = vi.fn();

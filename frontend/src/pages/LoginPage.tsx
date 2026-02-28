@@ -1,22 +1,31 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, type FormEvent } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
-const LoginPage: React.FC = () => {
+const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const redirectParam = new URLSearchParams(location.search).get('redirect');
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
     try {
       const user = await login(email, password);
-      
+
+      // If a redirect param was provided (e.g. from "Book Now"), honour it
+      if (redirectParam) {
+        navigate(redirectParam);
+        return;
+      }
+
       // Role-based redirect after successful login
       if (user.role === 'Admin') {
         navigate('/admin/dashboard');

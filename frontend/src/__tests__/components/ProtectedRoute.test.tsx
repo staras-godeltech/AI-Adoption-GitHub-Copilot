@@ -4,7 +4,6 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from '../../components/ProtectedRoute';
 import AuthContext from '../../contexts/AuthContext';
 import type { AuthUser } from '../../contexts/AuthContext';
-import React from 'react';
 
 const mockLogin = vi.fn();
 const mockRegister = vi.fn();

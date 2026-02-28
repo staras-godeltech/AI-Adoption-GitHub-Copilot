@@ -128,28 +128,19 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
+// Enable Swagger UI in all environments
+app.UseSwagger();
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Cosmetology Booking API v1");
+    options.RoutePrefix = "swagger";
+    options.DocumentTitle = "Cosmetology Booking API";
+});
+
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Cosmetology Booking API v1");
-        options.RoutePrefix = "swagger";
-        options.DocumentTitle = "Cosmetology Booking API";
-    });
-
     // Initialize and seed the database in Development
     await DbInitializer.InitializeAsync(app.Services);
-}
-else
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Cosmetology Booking API v1");
-        options.RoutePrefix = "swagger";
-        options.DocumentTitle = "Cosmetology Booking API";
-    });
 }
 
 app.UseCors("AllowFrontend");
@@ -184,22 +175,6 @@ app.MapGet("/api/health", () => Results.Ok(new
 }))
 .WithName("HealthCheck")
 .WithTags("Health");
-
-// DB diagnostic endpoint - returns counts of Users/Services/Appointments
-app.MapGet("/api/test/db", async (AppDbContext db) =>
-{
-    var counts = new
-    {
-        users = await db.Users.CountAsync(),
-        services = await db.Services.CountAsync(),
-        appointments = await db.Appointments.CountAsync(),
-        timeSlots = await db.TimeSlots.CountAsync()
-    };
-    return Results.Ok(counts);
-})
-.RequireAuthorization()
-.WithName("DbTest")
-.WithTags("Diagnostics");
 
 app.Run();
 
