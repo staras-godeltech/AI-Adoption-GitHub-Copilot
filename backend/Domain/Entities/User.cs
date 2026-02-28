@@ -12,5 +12,6 @@ public class User
     public string? PhoneNumber { get; set; }
 
     public ICollection<Appointment> CustomerAppointments { get; set; } = new List<Appointment>();
+    public ICollection<Appointment> CosmetologistAppointments { get; set; } = new List<Appointment>();
     public ICollection<TimeSlot> CosmetologistTimeSlots { get; set; } = new List<TimeSlot>();
 }
