@@ -123,6 +123,11 @@ builder.Services.AddAuthorization();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -135,6 +140,16 @@ if (app.Environment.IsDevelopment())
 
     // Initialize and seed the database in Development
     await DbInitializer.InitializeAsync(app.Services);
+}
+else
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Cosmetology Booking API v1");
+        options.RoutePrefix = "swagger";
+        options.DocumentTitle = "Cosmetology Booking API";
+    });
 }
 
 app.UseCors("AllowFrontend");
