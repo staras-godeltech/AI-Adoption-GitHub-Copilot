@@ -57,7 +57,7 @@ builder.Services.AddSwaggerGen(options =>
 // Configure CORS
 builder.Services.AddCors(options =>
 {
-    if (builder.Environment.IsDevelopment())
+    if (!builder.Environment.IsProduction())
     {
         options.AddPolicy("AllowFrontend", policy =>
         {
@@ -68,8 +68,8 @@ builder.Services.AddCors(options =>
     }
     else
     {
-        var allowedOrigins = builder.Configuration["CORS_ALLOWED_ORIGINS"]?.Split(',', StringSplitOptions.RemoveEmptyEntries)
-            ?? [];
+        var allowedOrigins = builder.Configuration["CORS_ALLOWED_ORIGINS"]
+            ?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? [];
         if (allowedOrigins.Length == 0)
         {
             throw new InvalidOperationException(
