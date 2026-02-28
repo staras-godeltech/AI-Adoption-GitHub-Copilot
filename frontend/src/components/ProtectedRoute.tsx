@@ -15,6 +15,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ role }) => {
   }
 
   if (role && user.role !== role) {
+    // Allow Cosmetologist to access Admin routes
+    if (role === 'Admin' && user.role === 'Cosmetologist') {
+      return <Outlet />;
+    }
     return <Navigate to="/unauthorized" replace />;
   }
 

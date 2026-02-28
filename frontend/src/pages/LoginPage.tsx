@@ -15,8 +15,20 @@ const LoginPage: React.FC = () => {
     setError(null);
     setLoading(true);
     try {
-      await login(email, password);
-      navigate('/');
+      const user = await login(email, password);
+      
+      // Role-based redirect after successful login
+      if (user.role === 'Admin') {
+        navigate('/admin/dashboard');
+      } else if (user.role === 'Customer') {
+        navigate('/customer/dashboard');
+      } else if (user.role === 'Cosmetologist') {
+        // Cosmetologists use the admin dashboard
+        navigate('/admin/dashboard');
+      } else {
+        // Default fallback
+        navigate('/customer/dashboard');
+      }
     } catch {
       setError('Invalid email or password. Please try again.');
     } finally {

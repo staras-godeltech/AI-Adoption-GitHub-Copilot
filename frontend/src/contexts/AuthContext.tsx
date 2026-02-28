@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
 import apiClient from '../services/api';
 
-export type UserRole = 'Admin' | 'Customer';
+export type UserRole = 'Admin' | 'Customer' | 'Cosmetologist';
 
 export interface AuthUser {
   id: string;
@@ -14,7 +14,7 @@ interface AuthContextType {
   user: AuthUser | null;
   token: string | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<AuthUser>;
   register: (name: string, email: string, password: string, role?: UserRole) => Promise<void>;
   logout: () => void;
 }
@@ -51,16 +51,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return buildUser(claims);
   });
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<AuthUser> => {
     const response = await apiClient.post<{ token: string }>('/api/auth/login', { email, password });
     const { token: newToken } = response.data;
     const claims = parseJwt(newToken);
     if (!claims) throw new Error('Invalid token received');
 
+    const authUser = buildUser(claims);
     localStorage.setItem('token', newToken);
     apiClient.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
     setToken(newToken);
-    setUser(buildUser(claims));
+    setUser(authUser);
+    return authUser;
   };
 
   const register = async (name: string, email: string, password: string, role: UserRole = 'Customer') => {
