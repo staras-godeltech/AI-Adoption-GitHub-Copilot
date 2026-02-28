@@ -54,15 +54,35 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// Configure CORS for frontend (React on port 5173)
+// Configure CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend", policy =>
+    if (!builder.Environment.IsProduction())
     {
-        policy.WithOrigins("http://localhost:5173")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
+        options.AddPolicy("AllowFrontend", policy =>
+        {
+            policy.WithOrigins("http://localhost:5173", "http://localhost:5174")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+    }
+    else
+    {
+        var allowedOrigins = builder.Configuration["CORS_ALLOWED_ORIGINS"]
+            ?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? [];
+        if (allowedOrigins.Length == 0)
+        {
+            throw new InvalidOperationException(
+                "CORS_ALLOWED_ORIGINS environment variable must be configured in production. " +
+                "Set it to a comma-separated list of allowed frontend origins.");
+        }
+        options.AddPolicy("AllowFrontend", policy =>
+        {
+            policy.WithOrigins(allowedOrigins)
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+    }
 });
 
 // Register EF Core DbContext with SQLite
