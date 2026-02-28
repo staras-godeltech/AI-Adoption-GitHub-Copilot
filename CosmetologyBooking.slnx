@@ -4,11 +4,11 @@
     <Project Path="backend/Application/CosmetologyBooking.Application.csproj" />
     <Project Path="backend/Domain/CosmetologyBooking.Domain.csproj" />
     <Project Path="backend/Infrastructure/CosmetologyBooking.Infrastructure.csproj" />
-    <Folder Name="/Tests/">
-      <Project Path="backend/Tests/API.Tests/CosmetologyBooking.API.Tests.csproj" />
-      <Project Path="backend/Tests/Application.Tests/CosmetologyBooking.Application.Tests.csproj" />
-      <Project Path="backend/Tests/Domain.Tests/CosmetologyBooking.Domain.Tests.csproj" />
-      <Project Path="backend/Tests/Infrastructure.Tests/CosmetologyBooking.Infrastructure.Tests.csproj" />
-    </Folder>
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="backend/Tests/API.Tests/CosmetologyBooking.API.Tests.csproj" />
+    <Project Path="backend/Tests/Application.Tests/CosmetologyBooking.Application.Tests.csproj" />
+    <Project Path="backend/Tests/Domain.Tests/CosmetologyBooking.Domain.Tests.csproj" />
+    <Project Path="backend/Tests/Infrastructure.Tests/CosmetologyBooking.Infrastructure.Tests.csproj" />
   </Folder>
 </Solution>
