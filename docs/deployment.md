@@ -77,7 +77,7 @@ Host=...render.com;Port=5432;Database=cosmetology;Username=cosmetology;Password=
    |-----|-------|
    | `ASPNETCORE_ENVIRONMENT` | `Production` |
    | `ConnectionStrings__Default` | Your PostgreSQL connection string from above |
-   | `Jwt__Key` | A random 32+ character secret (generate with `openssl rand -base64 32`) |
+   | `Jwt__Key` | A random 64-character hex secret (generate with `openssl rand -hex 32`) |
    | `Jwt__Issuer` | `CosmetologyBooking.API` |
    | `Jwt__Audience` | `CosmetologyBooking.Client` |
    | `CORS_ALLOWED_ORIGINS` | Your Vercel frontend URL (e.g., `https://my-app.vercel.app`) |
@@ -219,7 +219,7 @@ docker-compose down -v
 |----------|----------|-------------|---------|
 | `ASPNETCORE_ENVIRONMENT` | Yes | Runtime environment | `Production` |
 | `ConnectionStrings__Default` | Yes | Database connection string | `Host=...;Database=cosmetology;...` |
-| `Jwt__Key` | Yes | JWT signing secret (min 32 chars) | `randomly-generated-32-char-string` |
+| `Jwt__Key` | Yes | JWT signing secret (min 32 chars) | Generate: `openssl rand -hex 32` |
 | `Jwt__Issuer` | No | JWT issuer | `CosmetologyBooking.API` |
 | `Jwt__Audience` | No | JWT audience | `CosmetologyBooking.Client` |
 | `Jwt__ExpiryHours` | No | Token lifetime in hours | `24` |

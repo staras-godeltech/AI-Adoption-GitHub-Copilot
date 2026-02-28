@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   db:
     image: postgres:16-alpine
@@ -30,7 +28,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ConnectionStrings__Default: "Host=db;Port=5432;Database=${POSTGRES_DB:-cosmetology};Username=${POSTGRES_USER:-cosmetology};Password=${POSTGRES_PASSWORD:-changeme}"
-      Jwt__Key: ${JWT_KEY:-changeme-replace-with-at-least-32-char-secret-key}
+      Jwt__Key: ${JWT_KEY:?JWT_KEY must be set to a secure random value (run: openssl rand -hex 32)}
       Jwt__Issuer: CosmetologyBooking.API
       Jwt__Audience: CosmetologyBooking.Client
       Jwt__ExpiryHours: "24"
