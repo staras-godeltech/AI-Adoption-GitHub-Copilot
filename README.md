@@ -238,8 +238,9 @@ After the database is seeded, you can log in with:
 
 | Role | Email | Password |
 |------|-------|----------|
-| Admin | admin@cosmetology.com | Admin123! |
-| Customer | customer@example.com | Customer123! |
+| Admin | admin@cosmetology.local | Password123! |
+| Cosmetologist | jane.smith@cosmetology.local | Password123! |
+| Customer | john.doe@cosmetology.local | Password123! |
 
 ---
 
